@@ -9,7 +9,13 @@ fn main() {
   let dictionary: HashSet<&str> = dictionary.lines().collect();
 
   let text = fs::read_to_string("text.txt").unwrap().to_uppercase();
-  let words: Vec<&str> = text.split_whitespace().collect();
+  let text_words: Vec<&str> = text.split_whitespace().collect();
+  let words: Vec<&str> = text_words
+    .clone()
+    .into_iter()
+    .collect::<HashSet<&str>>()
+    .into_iter()
+    .collect();
 
   let mut map = [
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
@@ -53,12 +59,12 @@ fn main() {
       best_percentage = percentage;
     }
 
-    if percentage >= 99 {
-      break;
-    }
-
     let cutoff = 2000;
     if tries > cutoff {
+      if best_percentage >= 95 {
+        break;
+      }
+
       tries = 0;
       last_score = 0;
       fastrand::shuffle(&mut map);
@@ -69,7 +75,7 @@ fn main() {
 
   let mut new_words = vec![];
 
-  for &word in &words {
+  for &word in &text_words {
     let new_word: String = word.chars().map(|c| map[c as usize - 65]).collect();
     new_words.push(new_word);
     // let has = dictionary.contains(new_word.as_str());
